@@ -11,3 +11,5 @@
    dotnet build Api/Api.csproj
 3) Применяем миграции:
    dotnet ef database update --project Dal --startup-project Api --context UserDbContext
+
+   <img width="1770" height="782" alt="image" src="https://github.com/user-attachments/assets/1757a8b7-fad8-424b-8953-6918fd44d001" />
