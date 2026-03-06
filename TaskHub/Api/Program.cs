@@ -1,3 +1,5 @@
+using Api.Extensions;
+using Api.Services;
 using LoggingLibrary;
 
 namespace Api;
@@ -12,13 +14,48 @@ public sealed class Program
     /// </summary>
     public static void Main(string[] args)
     {
-        Host.CreateDefaultBuilder(args)
+        var host = Host.CreateDefaultBuilder(args)
             .UseInfraSerilog()
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
             })
-            .Build()
-            .Run();
+            .Build();
+
+        var provider = host.Services;
+
+        using (var scope1 = provider.CreateScope())
+        {
+            Console.WriteLine("===== SCOPE 1 =====");
+
+            var sp = scope1.ServiceProvider;
+
+            sp.TestService<ISingletonService1>();
+            sp.TestService<ISingletonService2>();
+
+            sp.TestService<IScopedService1>();
+            sp.TestService<IScopedService2>();
+
+            sp.TestService<ITransientService1>();
+            sp.TestService<ITransientService2>();
+        }
+
+        using (var scope2 = provider.CreateScope())
+        {
+            Console.WriteLine("===== SCOPE 2 =====");
+
+            var sp = scope2.ServiceProvider;
+
+            sp.TestService<ISingletonService1>();
+            sp.TestService<ISingletonService2>();
+
+            sp.TestService<IScopedService1>();
+            sp.TestService<IScopedService2>();
+
+            sp.TestService<ITransientService1>();
+            sp.TestService<ITransientService2>();
+        }
+
+        host.Run();
     }
 }
