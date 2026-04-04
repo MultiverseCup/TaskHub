@@ -1,3 +1,4 @@
+using Api.Filters;
 using Api.UseCases.Tasks;
 using Api.UseCases.Tasks.Interfaces;
 using Api.UseCases.Users;
@@ -47,6 +48,11 @@ public sealed class Startup
         services.AddScoped<ISetTaskTitleUseCase, SetTaskTitleUseCase>();
         services.AddScoped<IDeleteTaskUseCase, DeleteTaskUseCase>();
         services.AddScoped<IDeleteTasksUseCase, DeleteTasksUseCase>();
+
+        services.AddScoped<StudentInfoHeadersFilter>();
+        services.AddScoped<RequestLoggingFilter>();
+        services.AddScoped<ValidateCreateTaskRequestFilter>();
+        services.AddScoped<ValidateSetTaskTitleRequestFilter>();
 
         services.AddCors(options =>
         {

@@ -1,5 +1,6 @@
 ﻿using Api.Controllers.Tasks.Request;
 using Api.Controllers.Tasks.Response;
+using Api.Filters;
 using Api.UseCases.Tasks.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,8 @@ namespace Api.Controllers.Tasks;
 /// </summary>
 [ApiController]
 [Route("tasks")]
+[ServiceFilter(typeof(StudentInfoHeadersFilter))]
+[ServiceFilter(typeof(RequestLoggingFilter))]
 public sealed class TasksController : ControllerBase
 {
     private readonly ICreateTaskUseCase _createTaskUseCase;
@@ -39,6 +42,7 @@ public sealed class TasksController : ControllerBase
     /// Создать задачу
     /// </summary>
     [HttpPost]
+    [ServiceFilter(typeof(ValidateCreateTaskRequestFilter))]
     public async Task<ActionResult<TaskResponse>> CreateTaskAsync(
     [FromBody] CreateTaskRequest request,
     CancellationToken cancellationToken)
@@ -60,7 +64,7 @@ public sealed class TasksController : ControllerBase
     /// <summary>
     /// Получить задачу по id
     /// </summary>
-    [HttpGet("{id:guid}", Name = "GetTaskById")]
+    [HttpGet("{id}", Name = "GetTaskById")]
     public async Task<ActionResult<TaskResponse>> GetTaskByIdAsync(
     [FromRoute] Guid id,
     CancellationToken cancellationToken)
@@ -75,10 +79,11 @@ public sealed class TasksController : ControllerBase
     /// <summary>
     /// Изменить название задачи
     /// </summary>
-    [HttpPut("{id:guid}/title")]
+    [HttpPut("{id}/title")]
+    [ServiceFilter(typeof(ValidateSetTaskTitleRequestFilter))]
     public async Task<IActionResult> SetTaskTitleAsync(
         [FromRoute] Guid id,
-        [FromBody] SetTaskTitleRequest request,
+        [FromBody] SetTaskTitleRequest? request,
         CancellationToken cancellationToken)
     {
         var updated = await _setTaskTitleUseCase.ExecuteAsync(id, request.Title, cancellationToken);
@@ -91,7 +96,7 @@ public sealed class TasksController : ControllerBase
     /// <summary>
     /// Удалить задачу по id
     /// </summary>
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTaskByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
